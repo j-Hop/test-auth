@@ -1,0 +1,433 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+      "version": "2.0.2",
+      "title": "Swagger test",
+      "description": "Showing off swagger-ui-express",
+      "license": {
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+      }
+    },
+    "consumes": ["application/json", "multipart/form-data"],
+    "produces": ["application/json"],
+    "servers": [{ "url": "http://localhost:3000" }],
+    "tags": [
+      {"name": "UserAuth","description": "Registration and authentication endpoints"},
+      {"name": "User","description": "User's endpoints"}
+    ],
+    "paths": {
+      "/user/register": {
+        "post": {
+          "tags": ["UserAuth"],
+          "summary": "UserAuth registration",
+          "parameters": [],
+          "requestBody": {
+            "description": "Registration's object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/RegistrationResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request (invalid request body)",
+              "content": {}
+            },
+            "409": {
+              "description": "Provided email already exists",
+              "content": {}
+            }
+          }
+        }
+      },
+      "/user/login": {
+        "post": {
+          "tags": ["UserAuth"],
+          "summary": "UserAuth login",
+          "parameters": [],
+          "requestBody": {
+            "description": "Login credentials",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/LoginResponse"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized",
+              "content": {}
+            }
+          }
+        }
+      },
+      "/user/logout": {
+        "post": {
+          "tags": ["UserAuth"],
+          "summary": "UserAuth logout",
+          "parameters": [],
+          "security": [{ "Bearer": [] }],
+          "responses": {
+            "200": {
+              "description": "Successful logout",
+              "content": {}
+            },
+            "401": {
+              "description": "Unauthorized",
+              "content": {}
+            }
+          }
+        }
+      },
+      "/user/avatar":{
+        "patch": {
+          "tags": ["User"],
+          "summary": "Add aor update avatar",
+          "security": [{ "Bearer": [] }],
+          "requestBody": {
+            "description": "User avatar image",
+            "required": true,
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object",
+                  "properties":{
+                    "avatar":{
+                   "type":"string",
+                   "format":"binary",
+                   "description":"User avatar image file"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/AvatarSchemaRespons"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized",
+              "content": {}
+            }
+          }
+        }
+      },
+      "/user/{userId}":{
+        "get":{
+          "tags": ["User"],
+          "summary": "User info",
+          "parameters": [
+            {
+                "in": "path",
+              "name": "userId",
+              "required": true,
+              "description": "ID of the user",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "security": [{ "Bearer": [] }],
+          "responses": {
+            "200": {
+              "description": "Successful operation",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserInfoRespons"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized",
+              "content": {}
+            },
+            "404": {
+              "description": "User not found",
+              "content": {}
+            }
+          }
+        },
+        "patch": {
+          "tags": ["User"],
+          "summary": "Update user information",
+          "security": [{ "Bearer": [] }],
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "path",
+              "required": true,
+              "description": "ID of the user",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "description": "Updated user information",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserUpdateRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful update",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserInfoRespons"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized",
+              "content": {}
+            },
+            "404": {
+              "description": "User not found",
+              "content": {}
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "RegistrationRequest": {
+          "type": "object",
+          "required": ["name", "email", "password"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "User's name",
+              "format": "text",
+              "minLength": 1,
+              "maxLength": 32,
+              "example": "user"
+            },
+            "email": {
+              "type": "string",
+              "description": "User's email",
+              "format": "email"
+            },
+            "password": {
+              "type": "string",
+              "description": "User's password",
+              "minLength": 8,
+              "maxLength": 64,
+              "example": "qwerty123"
+            }
+          }
+        },
+        "RegistrationResponse": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "userId": {
+                "type": "number",
+                "description": "User's id",
+                "example": "3214323sdafrer43"
+              },
+              "LoginRequest":{
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "User's email",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "User's password",
+                    "minLength": 8,
+                    "maxLength": 64,
+                    "example": "qwerty123"
+                  }
+              }
+            },
+            "LoginResponse": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "JWT token for authentication"
+                },
+                "user": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "User's name"
+                    },
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "description": "User's email address"
+                    }
+                  },
+                  "required": ["name", "email"]
+                }
+              },
+              "required": ["token", "user"]
+            },
+              "AvatarSchemaRespons":{
+                "type": "object",
+                "properties": {
+                  "messages":{
+                    "type":"string",
+                    "description":"Messages about success operation "
+                  },
+                  "avatarUrl":{
+                    "type":"string",
+                    "description":"URL for avatar user"
+                  }
+                  }
+              }, 
+              "UserUpdateRequest":{
+                "type":"object",
+                "propertirs":{
+                  "name":{
+                    "type":"string",
+                    "minLength":1,
+                    "maxLength":32,
+                    "description":"Update user name"
+                  },
+                  "email":{
+                        "type":"string",
+                        "format":"email",
+                    "description":"Update user email"
+                  },
+                  "avatarUrl":{
+                        "type":"string",
+                    "description":"Update user avatar"
+                  },
+                  "gender":{
+                        "type":"string",
+                    "description":"Update user gender",
+                    "enum":["mail", "femail"]
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "User's Update password",
+                    "minLength": 8,
+                    "maxLength": 64
+                  },
+                  "dailyWaterGoal": {
+                    "type": "number",
+                    "description": "Updated user's daily water",
+                    "minimum": 0,
+                    "maximum": 15000,
+                    "example": 1500
+                  }
+                }
+              },
+              "UserInfoRespons":{
+                "type":"object",
+                "propertirs":{
+                  "userId":{
+                    "type":"string",
+                    "description":"Info userId"
+                  },
+                  "name":{
+                    "type":"string",
+                    "description":"Info user name"
+                  },
+                  "email":{
+                        "type":"string",
+                        "format":"email",
+                    "description":"Info user email"
+                  },
+                  "avatarUrl":{
+                        "type":"string",
+                    "description":"Info URL user avatar"
+                  },
+                  "gender":{
+                        "type":"string",
+                    "description":"Info user gender",
+                    "enum":["mail", "femail"]
+                  },
+                  "password": {
+                    "type": "string",
+                    "description": "User's Info password"
+                  },
+                  "token":{
+                    "type":"string",
+                    "description":"Ifo user about token"
+                  },
+                  "dailyWaterGoal": {
+                    "type": "number",
+                    "description": "Info user's daily water",
+                    "minimum": 0,
+                    "maximum": 15000,
+                    "example": 1500
+                  }
+                }
+              }
+            }
+          },  
+           
+          "example": [
+            { "email": "1@gmail.com", "userId": "1sfhea4tyhj4bev" },
+            { "email": "2@gmail.com", "userId": "2agbethghbtatfd" }
+          ]
+        }
+      },
+      "securitySchemes": {
+        "Bearer": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
+      }
+    }
+  }
